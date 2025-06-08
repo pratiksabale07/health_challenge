@@ -2,6 +2,8 @@
 <html lang="en">
 
 <head>
+  <meta charset="UTF-8">
+  <title>Health Challenge Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
@@ -14,6 +16,24 @@
     h2,
     h3 {
       text-align: center;
+    }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    select,
+    button {
+      margin: 5px;
+      padding: 6px 12px;
+      font-size: 14px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      cursor: pointer;
     }
 
     .score-row {
@@ -37,6 +57,12 @@
       height: 40px;
       border-radius: 50%;
       margin: 0 10px;
+    }
+
+    .user-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
     }
 
     .score-pill {
@@ -84,6 +110,12 @@
       margin: 2px 0;
     }
 
+    button.active {
+      background-color: #007bff;
+      color: white;
+      border-color: #007bff;
+    }
+
     @media screen and (max-width: 600px) {
       .score-row {
         flex-direction: column;
@@ -93,54 +125,6 @@
       .avatar {
         margin: 0.5rem 0;
       }
-    }
-  </style>
-
-
-  <meta charset="UTF-8">
-  <title>Health Challenge Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 10px;
-      background: #f7f7f7;
-    }
-
-    h2 {
-      text-align: center;
-    }
-
-    select,
-    button {
-      margin: 5px;
-      padding: 5px;
-    }
-
-    .card {
-      background: white;
-      border-radius: 8px;
-      padding: 15px;
-      margin: 10px 0;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
-
-    .user-avatar {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-    }
-
-    .filters {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 10px;
-      margin-bottom: 15px;
-    }
-
-    ul {
-      padding-left: 20px;
     }
   </style>
 </head>
@@ -158,14 +142,16 @@
     </select>
     <button onclick="showDashboard('overall')">Overall View</button>
     <button onclick="showDashboard('daywise')">Day-wise View</button>
+    <button onclick="showDashboard('winners')">Day-wise Winners</button>
   </div>
 
   <div id="dashboard"></div>
+
   <h3>📋 Daily User Responses</h3>
   <div id="daily-details"></div>
 
   <script>
-    const sheetUrl = 'https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLjzOaxwESBDR4oHeeo_QUA_2IfZK0fCNBnYUplfQW5kEGd8ECF5EFCjvrjHUjBY19hYQCIdTymV-zYS9aVDUGUhITmOPEotqK-xyGdkbB1JR-dR-pfUuiMDIxXvhY3f-FpmqRBkIHJBhxhTfBAw7n7Ko6B1dKEC51KBRhlRk2f1fUl-xVfq0npModP4s41QHthiuQtpgOmfjHe7Nl6ImLFhJAABb41wHGsakva2mUCK40S23jPeoEjffPPvQ3UE69Oon7j39Ud7DrQWzPifL7xVRyjcdg&lib=MH8Ay9aQHSQ-zcRY70OU9FjdRRDdf8ldN'; // Replace this with your Apps Script URL
+    const sheetUrl = 'https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLjzOaxwESBDR4oHeeo_QUA_2IfZK0fCNBnYUplfQW5kEGd8ECF5EFCjvrjHUjBY19hYQCIdTymV-zYS9aVDUGUhITmOPEotqK-xyGdkbB1JR-dR-pfUuiMDIxXvhY3f-FpmqRBkIHJBhxhTfBAw7n7Ko6B1dKEC51KBRhlRk2f1fUl-xVfq0npModP4s41QHthiuQtpgOmfjHe7Nl6ImLFhJAABb41wHGsakva2mUCK40S23jPeoEjffPPvQ3UE69Oon7j39Ud7DrQWzPifL7xVRyjcdg&lib=MH8Ay9aQHSQ-zcRY70OU9FjdRRDdf8ldN';
 
     const userImages = {
       "maheshsalunkhe.cssl@gmail.com": "https://robohash.org/mahesh.png?size=100x100",
@@ -194,7 +180,6 @@
     }
 
     function calculateTotal(row) {
-      debugger
       let total = 0;
       const fieldsToCheck = [
         "Sleep Time", "Exercise Today?", "Wake-up Time", "Daytime Nap?",
@@ -226,11 +211,9 @@
       dateFilter.innerHTML = '<option value="all">All Days</option>';
       userFilter.innerHTML = '<option value="all">All Users</option>';
 
-      [...dates]
-        .sort((a, b) => new Date(b) - new Date(a))  // Sort latest first
-        .forEach(d => {
-          dateFilter.innerHTML += `<option value="${d}">${d}</option>`;
-        });
+      [...dates].sort((a, b) => new Date(b) - new Date(a)).forEach(d => {
+        dateFilter.innerHTML += `<option value="${d}">${d}</option>`;
+      });
       [...users].sort().forEach(u => {
         userFilter.innerHTML += `<option value="${u}">${u}</option>`;
       });
@@ -238,8 +221,22 @@
 
     function showDashboard(mode) {
       dashboardMode = mode;
+
+      // Remove 'active' class from all buttons
+      document.querySelectorAll('.filters button').forEach(btn => btn.classList.remove('active'));
+
+      // Add 'active' class to the clicked button
+      const buttonMap = {
+        overall: 0,
+        daywise: 1,
+        winners: 2
+      };
+      const buttons = document.querySelectorAll('.filters button');
+      buttons[buttonMap[mode]].classList.add('active');
+
       renderDashboard();
     }
+
 
     function renderDashboard() {
       const selectedDate = document.getElementById("filter-date").value;
@@ -264,17 +261,15 @@
         const sorted = Object.entries(summary).sort((a, b) => b[1] - a[1]);
         sorted.forEach(([user, score], index) => {
           container.innerHTML += `
-  <div class="score-row">
-    <span class="rank">#${index + 1}</span>
-    <img src="${getUserImage(user)}" class="avatar">
-    <span class="username">${user}</span>
-    <span class="score-pill ${score >= 0 ? 'positive' : 'negative'}">${score > 0 ? '+' : ''}${score}</span>
-  </div>
-`;
-
+        <div class="score-row">
+          <span class="rank">#${index + 1}</span>
+          <img src="${getUserImage(user)}" class="avatar">
+          <span class="username">${user}</span>
+          <span class="score-pill ${score >= 0 ? 'positive' : 'negative'}">${score > 0 ? '+' : ''}${score}</span>
+        </div>`;
         });
 
-      } else {
+      } else if (dashboardMode === "daywise") {
         const grouped = {};
         filtered.forEach(row => {
           const date = new Date(row["Timestamp"]).toLocaleDateString();
@@ -282,13 +277,42 @@
           grouped[date].push(row);
         });
 
-        Object.keys(grouped).sort().forEach(date => {
+        Object.keys(grouped).sort((a, b) => new Date(b) - new Date(a)).forEach(date => {
           container.innerHTML += `<h4>📅 ${date}</h4>`;
           grouped[date].forEach(row => {
             container.innerHTML += `
           <div class="card">
             <img src="${getUserImage(row["Email Address"])}" class="user-avatar">
             <strong>${row["Email Address"]}</strong> → Score: <strong>${calculateTotal(row)}</strong>
+          </div>`;
+          });
+        });
+
+      } else if (dashboardMode === "winners") {
+        const grouped = {};
+        filtered.forEach(row => {
+          const date = new Date(row["Timestamp"]).toLocaleDateString();
+          grouped[date] = grouped[date] || [];
+          grouped[date].push(row);
+        });
+
+        Object.keys(grouped).sort((a, b) => new Date(b) - new Date(a)).forEach(date => {
+          const dayEntries = grouped[date].map(row => ({
+            email: row["Email Address"],
+            score: calculateTotal(row),
+            row
+          }));
+
+          const maxScore = Math.max(...dayEntries.map(e => e.score));
+          const winners = dayEntries.filter(e => e.score === maxScore);
+
+          container.innerHTML += `<h4>🏅 ${date} - Top Scorer(s)</h4>`;
+          winners.forEach(winner => {
+            container.innerHTML += `
+          <div class="score-row">
+            <img src="${getUserImage(winner.email)}" class="avatar">
+            <span class="username">${winner.email}</span>
+            <span class="score-pill positive">+${winner.score}</span>
           </div>`;
           });
         });
@@ -308,41 +332,32 @@
       const container = document.getElementById("daily-details");
       container.innerHTML = "";
 
+      filtered.sort((a, b) => new Date(b["Timestamp"]) - new Date(a["Timestamp"])).forEach((row) => {
+        const total = calculateTotal(row);
+        let detailHtml = `
+      <div class="card">
+        <h3>${row["Email Address"]} (${new Date(row["Timestamp"]).toLocaleDateString()})</h3>
+        <ul>`;
 
-      filtered
-        .sort((a, b) => new Date(b["Timestamp"]) - new Date(a["Timestamp"]))
-        .forEach((row) => {
-          const total = calculateTotal(row);
-          let detailHtml = `
-  <div class="card">
-    <h3>${row["Email Address"]} (${new Date(row["Timestamp"]).toLocaleDateString()})</h3>
-    <ul>
-`;
+        for (const key in row) {
+          if (key === "Timestamp" || key === "Email Address") continue;
+          const value = row[key];
+          const className = value.includes("(+") ? "positive" : value.includes("(-") ? "negative" : "neutral";
+          detailHtml += `<li class="${className}">${key}: ${value}</li>`;
+        }
 
-          for (const key in row) {
-            if (key === "Timestamp" || key === "Email Address") continue;
-            const value = row[key];
-            const className = value.includes("(+")
-              ? "positive"
-              : value.includes("(-")
-                ? "negative"
-                : "neutral";
-            detailHtml += `<li class="${className}">${key}: ${value}</li>`;
-          }
+        detailHtml += `
+        </ul>
+        <strong>Total Score: <span class="${total >= 0 ? 'positive' : 'negative'}">${total > 0 ? '+' : ''}${total}</span></strong>
+      </div>`;
 
-          detailHtml += `
-    </ul>
-    <strong>Total Score: <span class="${total >= 0 ? 'positive' : 'negative'}">${total > 0 ? '+' : ''}${total}</span></strong>
-  </div>
-`;
-          container.innerHTML += detailHtml;
-
-        });
-
+        container.innerHTML += detailHtml;
+      });
     }
 
     loadData();
   </script>
+
 </body>
 
 </html>
