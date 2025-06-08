@@ -1,230 +1,269 @@
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-      body {
-        font-family: 'Poppins', sans-serif;
-        margin: 0;
-        background: #f4f7fa;
-        color: #333;
-      }
-  
-      h2, h3 {
-        text-align: center;
-      }
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      background: #f4f7fa;
+      color: #333;
+    }
+
+    h2,
+    h3 {
+      text-align: center;
+    }
+
+    .score-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #fff;
+      border-radius: 12px;
+      margin: 0.5rem;
+      padding: 1rem;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .rank {
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin: 0 10px;
+    }
+
+    .score-pill {
+      padding: 0.4rem 0.8rem;
+      border-radius: 12px;
+      font-weight: bold;
+    }
+
+    .positive.score-pill {
+      background-color: #4caf50;
+      color: white;
+    }
+
+    .negative.score-pill {
+      background-color: #f44336;
+      color: white;
+    }
+
+    .card {
+      background: white;
+      margin: 1rem;
+      padding: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    }
+
+    .positive {
+      background-color: #e6ffe6;
+      padding: 0.4rem;
+      border-radius: 5px;
+      margin: 2px 0;
+    }
+
+    .negative {
+      background-color: #ffe6e6;
+      padding: 0.4rem;
+      border-radius: 5px;
+      margin: 2px 0;
+    }
+
+    .neutral {
+      background-color: #e6f0ff;
+      padding: 0.4rem;
+      border-radius: 5px;
+      margin: 2px 0;
+    }
+
+    @media screen and (max-width: 600px) {
       .score-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        background: #fff;
-        border-radius: 12px;
-        margin: 0.5rem;
-        padding: 1rem;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        flex-direction: column;
+        align-items: flex-start;
       }
-  
-      .rank {
-        font-size: 1.2rem;
-        font-weight: bold;
-      }
-  
+
       .avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        margin: 0 10px;
+        margin: 0.5rem 0;
       }
-  
-      .score-pill {
-        padding: 0.4rem 0.8rem;
-        border-radius: 12px;
-        font-weight: bold;
-      }
-  
-      .positive.score-pill {
-        background-color: #4caf50;
-        color: white;
-      }
-  
-      .negative.score-pill {
-        background-color: #f44336;
-        color: white;
-      }
-  
-      .card {
-        background: white;
-        margin: 1rem;
-        padding: 1rem;
-        border-radius: 10px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-      }
-  
-      .positive {
-        background-color: #e6ffe6;
-        padding: 0.4rem;
-        border-radius: 5px;
-        margin: 2px 0;
-      }
-  
-      .negative {
-        background-color: #ffe6e6;
-        padding: 0.4rem;
-        border-radius: 5px;
-        margin: 2px 0;
-      }
-  
-      .neutral {
-        background-color: #e6f0ff;
-        padding: 0.4rem;
-        border-radius: 5px;
-        margin: 2px 0;
-      }
-  
-      @media screen and (max-width: 600px) {
-        .score-row {
-          flex-direction: column;
-          align-items: flex-start;
-        }
-        .avatar {
-          margin: 0.5rem 0;
-        }
-      }
-    </style>
-  
-  
+    }
+  </style>
+
+
   <meta charset="UTF-8">
   <title>Health Challenge Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { font-family: Arial, sans-serif; padding: 10px; background: #f7f7f7; }
-    h2 { text-align: center; }
-    select, button { margin: 5px; padding: 5px; }
-    .card { background: white; border-radius: 8px; padding: 15px; margin: 10px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    .user-avatar { width: 50px; height: 50px; border-radius: 50%; }
-    .filters { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 15px; }
-    ul { padding-left: 20px; }
+    body {
+      font-family: Arial, sans-serif;
+      padding: 10px;
+      background: #f7f7f7;
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    select,
+    button {
+      margin: 5px;
+      padding: 5px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 8px;
+      padding: 15px;
+      margin: 10px 0;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .user-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+    }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    ul {
+      padding-left: 20px;
+    }
   </style>
 </head>
+
 <body>
 
-<h2>🏆 Health Challenge Dashboard</h2>
+  <h2>🏆 Health Challenge Dashboard</h2>
 
-<div class="filters">
-  <select id="filter-date" onchange="renderDashboard(); renderDailyDetails();">
-    <option value="all">All Days</option>
-  </select>
-  <select id="filter-user" onchange="renderDashboard(); renderDailyDetails();">
-    <option value="all">All Users</option>
-  </select>
-  <button onclick="showDashboard('overall')">Overall View</button>
-  <button onclick="showDashboard('daywise')">Day-wise View</button>
-</div>
+  <div class="filters">
+    <select id="filter-date" onchange="renderDashboard(); renderDailyDetails();">
+      <option value="all">All Days</option>
+    </select>
+    <select id="filter-user" onchange="renderDashboard(); renderDailyDetails();">
+      <option value="all">All Users</option>
+    </select>
+    <button onclick="showDashboard('overall')">Overall View</button>
+    <button onclick="showDashboard('daywise')">Day-wise View</button>
+  </div>
 
-<div id="dashboard"></div>
-<h3>📋 Daily User Responses</h3>
-<div id="daily-details"></div>
+  <div id="dashboard"></div>
+  <h3>📋 Daily User Responses</h3>
+  <div id="daily-details"></div>
 
-<script>
-const sheetUrl = 'https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLjzOaxwESBDR4oHeeo_QUA_2IfZK0fCNBnYUplfQW5kEGd8ECF5EFCjvrjHUjBY19hYQCIdTymV-zYS9aVDUGUhITmOPEotqK-xyGdkbB1JR-dR-pfUuiMDIxXvhY3f-FpmqRBkIHJBhxhTfBAw7n7Ko6B1dKEC51KBRhlRk2f1fUl-xVfq0npModP4s41QHthiuQtpgOmfjHe7Nl6ImLFhJAABb41wHGsakva2mUCK40S23jPeoEjffPPvQ3UE69Oon7j39Ud7DrQWzPifL7xVRyjcdg&lib=MH8Ay9aQHSQ-zcRY70OU9FjdRRDdf8ldN'; // Replace this with your Apps Script URL
+  <script>
+    const sheetUrl = 'https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLjzOaxwESBDR4oHeeo_QUA_2IfZK0fCNBnYUplfQW5kEGd8ECF5EFCjvrjHUjBY19hYQCIdTymV-zYS9aVDUGUhITmOPEotqK-xyGdkbB1JR-dR-pfUuiMDIxXvhY3f-FpmqRBkIHJBhxhTfBAw7n7Ko6B1dKEC51KBRhlRk2f1fUl-xVfq0npModP4s41QHthiuQtpgOmfjHe7Nl6ImLFhJAABb41wHGsakva2mUCK40S23jPeoEjffPPvQ3UE69Oon7j39Ud7DrQWzPifL7xVRyjcdg&lib=MH8Ay9aQHSQ-zcRY70OU9FjdRRDdf8ldN'; // Replace this with your Apps Script URL
 
-const userImages = {
-  "maheshsalunkhe.cssl@gmail.com": "https://robohash.org/mahesh.png?size=100x100",
-  "arunasalunkhe2012@gmail.com": "https://robohash.org/aruna.png?size=100x100",
-  "pratiksabale.ps@gmail.com": "https://robohash.org/pratik.png?size=100x100",
-  "default": "https://robohash.org/default.png?size=100x100"
-};
+    const userImages = {
+      "maheshsalunkhe.cssl@gmail.com": "https://robohash.org/mahesh.png?size=100x100",
+      "arunasalunkhe2012@gmail.com": "https://robohash.org/aruna.png?size=100x100",
+      "pratiksabale.ps@gmail.com": "https://robohash.org/pratik.png?size=100x100",
+      "default": "https://robohash.org/default.png?size=100x100"
+    };
 
-let rawData = [];
-let dashboardMode = 'overall';
+    let rawData = [];
+    let dashboardMode = 'overall';
 
-function getUserImage(email) {
-  return userImages[email] || userImages["default"];
-}
+    function getUserImage(email) {
+      return userImages[email] || userImages["default"];
+    }
 
-function loadData() {
-  fetch(sheetUrl)
-    .then(response => response.json())
-    .then(data => {
-      rawData = data;
-      populateFilters();
+    function loadData() {
+      fetch(sheetUrl)
+        .then(response => response.json())
+        .then(data => {
+          rawData = data;
+          populateFilters();
+          renderDashboard();
+          renderDailyDetails();
+        })
+        .catch(err => console.error("Data load error", err));
+    }
+
+    function calculateTotal(row) {
+      debugger
+      let total = 0;
+      const fieldsToCheck = [
+        "Sleep Time", "Exercise Today?", "Wake-up Time", "Daytime Nap?",
+        "🍏 Healthy Foods", "🔴 Unhealthy Foods", "🏆 Bonus Actions"
+      ];
+      fieldsToCheck.forEach(field => {
+        const val = row[field];
+        if (!val) return;
+        const matches = [...val.matchAll(/\(([-+]?\d+)\)/g)];
+        matches.forEach(match => {
+          total += parseInt(match[1], 10);
+        });
+      });
+      return total;
+    }
+
+    function populateFilters() {
+      const dates = new Set();
+      const users = new Set();
+      rawData.forEach(row => {
+        const date = new Date(row["Timestamp"]).toLocaleDateString();
+        dates.add(date);
+        users.add(row["Email Address"]);
+      });
+
+      const dateFilter = document.getElementById("filter-date");
+      const userFilter = document.getElementById("filter-user");
+
+      dateFilter.innerHTML = '<option value="all">All Days</option>';
+      userFilter.innerHTML = '<option value="all">All Users</option>';
+
+      [...dates]
+        .sort((a, b) => new Date(b) - new Date(a))  // Sort latest first
+        .forEach(d => {
+          dateFilter.innerHTML += `<option value="${d}">${d}</option>`;
+        });
+      [...users].sort().forEach(u => {
+        userFilter.innerHTML += `<option value="${u}">${u}</option>`;
+      });
+    }
+
+    function showDashboard(mode) {
+      dashboardMode = mode;
       renderDashboard();
-      renderDailyDetails();
-    })
-    .catch(err => console.error("Data load error", err));
-}
+    }
 
-function calculateTotal(row) {
-  debugger
-  let total = 0;
-  const fieldsToCheck = [
-    "Sleep Time", "Exercise Today?", "Wake-up Time", "Daytime Nap?",
-    "🍏 Healthy Foods", "🔴 Unhealthy Foods", "🏆 Bonus Actions"
-  ];
-  fieldsToCheck.forEach(field => {
-    const val = row[field];
-    if (!val) return;
-    const matches = [...val.matchAll(/\(([-+]?\d+)\)/g)];
-    matches.forEach(match => {
-      total += parseInt(match[1], 10);
-    });
-  });
-  return total;
-}
+    function renderDashboard() {
+      const selectedDate = document.getElementById("filter-date").value;
+      const selectedUser = document.getElementById("filter-user").value;
+      const container = document.getElementById("dashboard");
+      container.innerHTML = "";
 
-function populateFilters() {
-  const dates = new Set();
-  const users = new Set();
-  rawData.forEach(row => {
-    const date = new Date(row["Timestamp"]).toLocaleDateString();
-    dates.add(date);
-    users.add(row["Email Address"]);
-  });
+      let filtered = rawData.filter(row => {
+        const rowDate = new Date(row["Timestamp"]).toLocaleDateString();
+        return (selectedDate === "all" || rowDate === selectedDate) &&
+          (selectedUser === "all" || row["Email Address"] === selectedUser);
+      });
 
-  const dateFilter = document.getElementById("filter-date");
-  const userFilter = document.getElementById("filter-user");
+      if (dashboardMode === "overall") {
+        let summary = {};
+        filtered.forEach(row => {
+          const user = row["Email Address"];
+          const score = calculateTotal(row);
+          summary[user] = (summary[user] || 0) + score;
+        });
 
-  dateFilter.innerHTML = '<option value="all">All Days</option>';
-  userFilter.innerHTML = '<option value="all">All Users</option>';
-
-  [...dates].sort().forEach(d => {
-    dateFilter.innerHTML += `<option value="${d}">${d}</option>`;
-  });
-  [...users].sort().forEach(u => {
-    userFilter.innerHTML += `<option value="${u}">${u}</option>`;
-  });
-}
-
-function showDashboard(mode) {
-  dashboardMode = mode;
-  renderDashboard();
-}
-
-function renderDashboard() {
-  const selectedDate = document.getElementById("filter-date").value;
-  const selectedUser = document.getElementById("filter-user").value;
-  const container = document.getElementById("dashboard");
-  container.innerHTML = "";
-
-  let filtered = rawData.filter(row => {
-    const rowDate = new Date(row["Timestamp"]).toLocaleDateString();
-    return (selectedDate === "all" || rowDate === selectedDate) &&
-           (selectedUser === "all" || row["Email Address"] === selectedUser);
-  });
-
-  if (dashboardMode === "overall") {
-    let summary = {};
-    filtered.forEach(row => {
-      const user = row["Email Address"];
-      const score = calculateTotal(row);
-      summary[user] = (summary[user] || 0) + score;
-    });
-
-    const sorted = Object.entries(summary).sort((a,b) => b[1]-a[1]);
-    sorted.forEach(([user, score], index) => {
-      container.innerHTML += `
+        const sorted = Object.entries(summary).sort((a, b) => b[1] - a[1]);
+        sorted.forEach(([user, score], index) => {
+          container.innerHTML += `
   <div class="score-row">
     <span class="rank">#${index + 1}</span>
     <img src="${getUserImage(user)}" class="avatar">
@@ -233,74 +272,77 @@ function renderDashboard() {
   </div>
 `;
 
-    });
+        });
 
-  } else {
-    const grouped = {};
-    filtered.forEach(row => {
-      const date = new Date(row["Timestamp"]).toLocaleDateString();
-      grouped[date] = grouped[date] || [];
-      grouped[date].push(row);
-    });
+      } else {
+        const grouped = {};
+        filtered.forEach(row => {
+          const date = new Date(row["Timestamp"]).toLocaleDateString();
+          grouped[date] = grouped[date] || [];
+          grouped[date].push(row);
+        });
 
-    Object.keys(grouped).sort().forEach(date => {
-      container.innerHTML += `<h4>📅 ${date}</h4>`;
-      grouped[date].forEach(row => {
-        container.innerHTML += `
+        Object.keys(grouped).sort().forEach(date => {
+          container.innerHTML += `<h4>📅 ${date}</h4>`;
+          grouped[date].forEach(row => {
+            container.innerHTML += `
           <div class="card">
             <img src="${getUserImage(row["Email Address"])}" class="user-avatar">
             <strong>${row["Email Address"]}</strong> → Score: <strong>${calculateTotal(row)}</strong>
           </div>`;
+          });
+        });
+      }
+    }
+
+    function renderDailyDetails() {
+      const selectedDate = document.getElementById("filter-date").value;
+      const selectedUser = document.getElementById("filter-user").value;
+
+      const filtered = rawData.filter(row => {
+        const rowDate = new Date(row["Timestamp"]).toLocaleDateString();
+        return (selectedDate === 'all' || rowDate === selectedDate) &&
+          (selectedUser === 'all' || row["Email Address"] === selectedUser);
       });
-    });
-  }
-}
 
-function renderDailyDetails() {
-  const selectedDate = document.getElementById("filter-date").value;
-  const selectedUser = document.getElementById("filter-user").value;
+      const container = document.getElementById("daily-details");
+      container.innerHTML = "";
 
-  const filtered = rawData.filter(row => {
-    const rowDate = new Date(row["Timestamp"]).toLocaleDateString();
-    return (selectedDate === 'all' || rowDate === selectedDate) &&
-           (selectedUser === 'all' || row["Email Address"] === selectedUser);
-  });
 
-  const container = document.getElementById("daily-details");
-  container.innerHTML = "";
-
-  
-  filtered.forEach((row) => {
-    const total = calculateTotal(row);
-let detailHtml = `
+      filtered
+        .sort((a, b) => new Date(b["Timestamp"]) - new Date(a["Timestamp"]))
+        .forEach((row) => {
+          const total = calculateTotal(row);
+          let detailHtml = `
   <div class="card">
     <h3>${row["Email Address"]} (${new Date(row["Timestamp"]).toLocaleDateString()})</h3>
     <ul>
 `;
 
-for (const key in row) {
-  if (key === "Timestamp" || key === "Email Address") continue;
-  const value = row[key];
-  const className = value.includes("(+")
-    ? "positive"
-    : value.includes("(-")
-    ? "negative"
-    : "neutral";
-  detailHtml += `<li class="${className}">${key}: ${value}</li>`;
-}
+          for (const key in row) {
+            if (key === "Timestamp" || key === "Email Address") continue;
+            const value = row[key];
+            const className = value.includes("(+")
+              ? "positive"
+              : value.includes("(-")
+                ? "negative"
+                : "neutral";
+            detailHtml += `<li class="${className}">${key}: ${value}</li>`;
+          }
 
-detailHtml += `
+          detailHtml += `
     </ul>
     <strong>Total Score: <span class="${total >= 0 ? 'positive' : 'negative'}">${total > 0 ? '+' : ''}${total}</span></strong>
   </div>
 `;
-container.innerHTML += detailHtml;
+          container.innerHTML += detailHtml;
 
-});
+        });
 
-}
+    }
 
-loadData();
-</script>
+    loadData();
+  </script>
 </body>
+
 </html>
