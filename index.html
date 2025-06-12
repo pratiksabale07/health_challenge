@@ -2,361 +2,435 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <title>Health Challenge Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Family Health Challenge Dashboard</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js/dist/Chart.min.css">
   <style>
     body {
-      font-family: 'Poppins', sans-serif;
+      font-family: 'Segoe UI', sans-serif;
       margin: 0;
-      background: #f4f7fa;
-      color: #333;
+      padding: 0;
+      background: #f0f2f5;
     }
 
-    h2,
-    h3 {
+    header {
+      padding: 1rem;
+      background: linear-gradient(90deg, #4caf50, #66bb6a);
+      color: white;
       text-align: center;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    nav {
+      background: white;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      padding: 0.5rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    nav button {
+      padding: 0.5rem 1rem;
+      background: #66bb6a;
+      border: none;
+      color: white;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    nav button:hover {
+      background: #4caf50;
     }
 
     .filters {
       display: flex;
       flex-wrap: wrap;
-      justify-content: center;
-      gap: 10px;
-      margin-bottom: 15px;
+      gap: 1rem;
+      padding: 1rem;
+      background: #ffffff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     }
 
-    select,
-    button {
-      margin: 5px;
-      padding: 6px 12px;
-      font-size: 14px;
+    .filters select {
+      flex: 1;
+      padding: 0.5rem;
       border-radius: 6px;
       border: 1px solid #ccc;
-      cursor: pointer;
     }
 
-    .score-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: #fff;
-      border-radius: 12px;
-      margin: 0.5rem;
+    .leaderboard,
+    .user-details,
+    .day-topper,
+    .weekly-summary,
+    .habit-summary,
+    .chart-view {
       padding: 1rem;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     }
 
-    .rank {
+    .section-title {
+      margin-bottom: 0.5rem;
       font-size: 1.2rem;
-      font-weight: bold;
-    }
-
-    .avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      margin: 0 10px;
-    }
-
-    .user-avatar {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-    }
-
-    .score-pill {
-      padding: 0.4rem 0.8rem;
-      border-radius: 12px;
-      font-weight: bold;
-    }
-
-    .positive.score-pill {
-      background-color: #4caf50;
-      color: white;
-    }
-
-    .negative.score-pill {
-      background-color: #f44336;
-      color: white;
+      color: #333;
     }
 
     .card {
       background: white;
-      margin: 1rem;
+      border-radius: 1rem;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      margin-bottom: 1rem;
       padding: 1rem;
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      transition: transform 0.2s ease-in-out;
+    }
+
+    .card:hover {
+      transform: scale(1.02);
+    }
+
+    .card h3 {
+      margin: 0 0 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card h3 img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .points {
+      font-weight: bold;
+      font-size: 1.1rem;
     }
 
     .positive {
-      background-color: #e6ffe6;
-      padding: 0.4rem;
-      border-radius: 5px;
-      margin: 2px 0;
+      color: green;
     }
 
     .negative {
-      background-color: #ffe6e6;
-      padding: 0.4rem;
-      border-radius: 5px;
-      margin: 2px 0;
+      color: red;
     }
 
-    .neutral {
-      background-color: #e6f0ff;
-      padding: 0.4rem;
-      border-radius: 5px;
-      margin: 2px 0;
+    ul {
+      padding-left: 1rem;
     }
 
-    button.active {
-      background-color: #007bff;
-      color: white;
-      border-color: #007bff;
+    canvas {
+      width: 100% !important;
+      max-width: 600px;
+      margin: 1rem auto;
+      display: block;
     }
 
-    @media screen and (max-width: 600px) {
-      .score-row {
+    @media (max-width: 600px) {
+      .filters {
         flex-direction: column;
-        align-items: flex-start;
       }
 
-      .avatar {
-        margin: 0.5rem 0;
+      nav {
+        flex-direction: column;
+        gap: 0.5rem;
       }
     }
   </style>
 </head>
 
 <body>
-
-  <h2>🏆 Health Challenge Dashboard</h2>
-
-  <div class="filters">
-    <select id="filter-date" onchange="renderDashboard(); renderDailyDetails();">
-      <option value="all">All Days</option>
+  <header>
+    <h1>🏃‍♀️ Family Health Challenge</h1>
+  </header>
+  <nav>
+    <button onclick="scrollToSection('leaderboardList')">Leaderboard</button>
+    <button onclick="scrollToSection('dayTopperList')">Day-wise Topper</button>
+    <button onclick="scrollToSection('weeklySummaryList')">Weekly Summary</button>
+    <button onclick="scrollToSection('habitSummaryList')">Habit Insights</button>
+    <button onclick="scrollToSection('chartSection')">Charts</button>
+  </nav>
+  <section class="filters">
+    <select id="dateFilter">
+      <option value="">All Dates</option>
     </select>
-    <select id="filter-user" onchange="renderDashboard(); renderDailyDetails();">
-      <option value="all">All Users</option>
+    <select id="nameFilter">
+      <option value="">All Members</option>
     </select>
-    <button onclick="showDashboard('overall')">Overall View</button>
-    <button onclick="showDashboard('daywise')">Day-wise View</button>
-    <button onclick="showDashboard('winners')">Day-wise Winners</button>
-  </div>
+  </section>
 
-  <div id="dashboard"></div>
+  <section class="day-topper">
+    <h2 class="section-title">🥇 Day-wise Top Performer</h2>
+    <div id="dayTopperList"></div>
+  </section>
 
-  <h3>📋 Daily User Responses</h3>
-  <div id="daily-details"></div>
+  <section class="leaderboard">
+    <h2 class="section-title">🏆 Overall Leaderboard</h2>
+    <div id="leaderboardList"></div>
+  </section>
+
+  <section class="weekly-summary">
+    <h2 class="section-title">📈 Weekly Summary</h2>
+    <div id="weeklySummaryList">
+      <div class="card">
+        <p>Total Points This Week: <span id="totalPoints" class="points"></span></p>
+        <p>Average Daily Score: <span id="averageScore" class="points"></span></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="habit-summary">
+    <h2 class="section-title">💡 Habit Insights</h2>
+    <div id="habitSummaryList">
+      <div class="card">
+        <p>Most Common Good Habit: <span id="bestHabit" class="positive"></span></p>
+        <p>Most Common Bad Habit: <span id="worstHabit" class="negative"></span></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="chart-view">
+    <h2 class="section-title">📊 Progress Charts</h2>
+    <div class="chart-container">
+      <canvas id="trendChart"></canvas>
+    </div>
+  </section>
+
+  <section class="user-details">
+    <h2 class="section-title">📋 User Details</h2>
+    <div id="userCards"></div>
+  </section>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 
   <script>
-    const sheetUrl = 'https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLjhdI0_yEF8tWMvX_pUGoc1DsrLV3F9pQPmt3lC2IgtgoOhQhEh-RyeN7ygKshuSJzjNKcx4lR-tyQkFKr8SuX1u9Dtwksr8L1fk2OiaYjgqfUOQq0FmWicZFtyN68Sf_ONWFh7W_jSfo3qAXovHBCVsMzdHT4Dx8iozbfiq90y5HO0y-gtiwToQvvdN88HpM9Gl5eq2zYgxNoUO-nvHgCDcKdzigSSQ6cSydDP9kyZVdXRg-vnULBzLdT7m2nI5REtV2K9Bc9jDvxFuBT11Q95NDxBVQ&lib=MyIlNBURLXuBnU_6sRfgeEjdRRDdf8ldN';
+    const DATA_URL = 'https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLjhdI0_yEF8tWMvX_pUGoc1DsrLV3F9pQPmt3lC2IgtgoOhQhEh-RyeN7ygKshuSJzjNKcx4lR-tyQkFKr8SuX1u9Dtwksr8L1fk2OiaYjgqfUOQq0FmWicZFtyN68Sf_ONWFh7W_jSfo3qAXovHBCVsMzdHT4Dx8iozbfiq90y5HO0y-gtiwToQvvdN88HpM9Gl5eq2zYgxNoUO-nvHgCDcKdzigSSQ6cSydDP9kyZVdXRg-vnULBzLdT7m2nI5REtV2K9Bc9jDvxFuBT11Q95NDxBVQ&lib=MyIlNBURLXuBnU_6sRfgeEjdRRDdf8ldN'; // Replace with your actual URL
+    function scrollToSection(id) {
+      document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+    }
+    const emailNameMap = {
+      "maheshsalunkhe.cssl@gmail.com": "Mahesh Salunkhe",
+      "arunasalunkhe2012@gmail.com": "Aruna Salunkhe",
+      "pratiksabale.ps@gmail.com": "Pratik Sabale",
+      "sheetalingale90.si@gmail.com": "Sheetal Salunkhe",
+      "gauridisale.gd@gmail.com": "Gauri Disale",
+      "manishasabale1771980@gmail.com": "Manisha Sabale",
+      "aryansabale403@gmail.com": "Aryan Sabale",
+      "sanikadisale123@gmail.com": "Sanika Sabale",
+      "mayadisale410@gmail.com": "Maya Disale",
+      "sakshamsalunkhe2021@gmail.com": "Saksham Salunkhe"
+    };
 
-    const userImages = {
-      "maheshsalunkhe.cssl@gmail.com": "https://robohash.org/mahesh.png?size=100x100",
-      "arunasalunkhe2012@gmail.com": "https://robohash.org/aruna.png?size=100x100",
-      "pratiksabale.ps@gmail.com": "https://robohash.org/pratik.png?size=100x100",
-      "default": "https://robohash.org/default.png?size=100x100"
+    const emailImageMap = {
+      "maheshsalunkhe.cssl@gmail.com": "https://i.pravatar.cc/100?u=mahesh",
+      "arunasalunkhe2012@gmail.com": "https://i.pravatar.cc/100?u=aruna"
     };
 
     let rawData = [];
-    let dashboardMode = 'overall';
+    let filteredData = [];
 
-    function getUserImage(email) {
-      return userImages[email] || userImages["default"];
-    }
+    const parsePoints = (text = '') => {
+      const matches = [...text.matchAll(/\(([-+]\d+)\)/g)];
+      return matches.reduce((sum, match) => sum + parseInt(match[1], 10), 0);
+    };
 
-    function loadData() {
-      fetch(sheetUrl)
-        .then(response => response.json())
-        .then(data => {
-          rawData = data;
-          populateFilters();
-          renderDashboard();
-          renderDailyDetails();
-        })
-        .catch(err => console.error("Data load error", err));
-    }
+    const groupBy = (arr, keyFn) => {
+      return arr.reduce((acc, item) => {
+        const key = keyFn(item);
+        acc[key] = acc[key] || [];
+        acc[key].push(item);
+        return acc;
+      }, {});
+    };
 
-    function calculateTotal(row) {
-      let total = 0;
-      const fieldsToCheck = [
-        "Sleep Time", "Exercise Today?", "Wake-up Time", "Daytime Nap?",
-        "🍏 Healthy Foods", "🔴 Unhealthy Foods", "🏆 Bonus Actions"
-      ];
-      fieldsToCheck.forEach(field => {
-        const val = row[field];
-        if (!val) return;
-        const matches = [...val.matchAll(/\(([-+]?\d+)\)/g)];
-        matches.forEach(match => {
-          total += parseInt(match[1], 10);
-        });
-      });
-      return total;
-    }
+    const loadData = async () => {
+      const res = await fetch(DATA_URL);
+      rawData = await res.json();
+      populateFilters(rawData)
+      applyFilters();
+    };
 
-    function populateFilters() {
-      const dates = new Set();
-      const users = new Set();
-      rawData.forEach(row => {
-        const date = new Date(row["Timestamp"]).toLocaleDateString();
-        dates.add(date);
-        users.add(row["Email Address"]);
+    const applyFilters = () => {
+      const dateValue = document.getElementById("dateFilter").value;
+      const nameValue = document.getElementById("nameFilter").value;
+
+      filteredData = rawData.filter(entry => {
+        const matchDate = !dateValue || new Date(entry.Timestamp).toISOString().split('T')[0] === dateValue;
+        const matchName = !nameValue || entry["Email Address"] === nameValue;
+        return matchDate && matchName;
       });
 
-      const dateFilter = document.getElementById("filter-date");
-      const userFilter = document.getElementById("filter-user");
+      processData();
+    };
 
-      dateFilter.innerHTML = '<option value="all">All Days</option>';
-      userFilter.innerHTML = '<option value="all">All Users</option>';
+    const processData = () => {
+      const userDataMap = {};
+      const dateUserPoints = {};
+      const habitCount = {};
+      const habitNegatives = {};
+      let totalWeekPoints = 0;
 
-      [...dates].sort((a, b) => new Date(b) - new Date(a)).forEach(d => {
-        dateFilter.innerHTML += `<option value="${d}">${d}</option>`;
-      });
-      [...users].sort().forEach(u => {
-        userFilter.innerHTML += `<option value="${u}">${u}</option>`;
-      });
-    }
+      filteredData.forEach(entry => {
+        const email = entry["Email Address"];
+        const date = new Date(entry.Timestamp).toISOString().split('T')[0];
+        const name = emailNameMap[email] || email;
+        const img = emailImageMap[email];
 
-    function showDashboard(mode) {
-      dashboardMode = mode;
+        const fields = Object.keys(entry).filter(k => !["Timestamp", "Email Address"].includes(k));
+        let totalPoints = 0;
+        const detail = [];
 
-      // Remove 'active' class from all buttons
-      document.querySelectorAll('.filters button').forEach(btn => btn.classList.remove('active'));
+        fields.forEach(field => {
+          const value = entry[field];
+          const point = parsePoints(value);
+          totalPoints += point;
+          detail.push({ field, value, point });
 
-      // Add 'active' class to the clicked button
-      const buttonMap = {
-        overall: 0,
-        daywise: 1,
-        winners: 2
-      };
-      const buttons = document.querySelectorAll('.filters button');
-      buttons[buttonMap[mode]].classList.add('active');
-
-      renderDashboard();
-    }
-
-
-    function renderDashboard() {
-      const selectedDate = document.getElementById("filter-date").value;
-      const selectedUser = document.getElementById("filter-user").value;
-      const container = document.getElementById("dashboard");
-      container.innerHTML = "";
-
-      let filtered = rawData.filter(row => {
-        const rowDate = new Date(row["Timestamp"]).toLocaleDateString();
-        return (selectedDate === "all" || rowDate === selectedDate) &&
-          (selectedUser === "all" || row["Email Address"] === selectedUser);
-      });
-
-      if (dashboardMode === "overall") {
-        let summary = {};
-        filtered.forEach(row => {
-          const user = row["Email Address"];
-          const score = calculateTotal(row);
-          summary[user] = (summary[user] || 0) + score;
+          if (point > 0) {
+            habitCount[field + " " + value] = (habitCount[field + " " + value] || 0) + 1;
+          } else if (point < 0) {
+            habitNegatives[field + " " + value] = (habitNegatives[field + " " + value] || 0) + 1;
+          }
         });
 
-        const sorted = Object.entries(summary).sort((a, b) => b[1] - a[1]);
-        sorted.forEach(([user, score], index) => {
-          container.innerHTML += `
-        <div class="score-row">
-          <span class="rank">#${index + 1}</span>
-          <img src="${getUserImage(user)}" class="avatar">
-          <span class="username">${user}</span>
-          <span class="score-pill ${score >= 0 ? 'positive' : 'negative'}">${score > 0 ? '+' : ''}${score}</span>
-        </div>`;
-        });
-
-      } else if (dashboardMode === "daywise") {
-        const grouped = {};
-        filtered.forEach(row => {
-          const date = new Date(row["Timestamp"]).toLocaleDateString();
-          grouped[date] = grouped[date] || [];
-          grouped[date].push(row);
-        });
-
-        Object.keys(grouped).sort((a, b) => new Date(b) - new Date(a)).forEach(date => {
-          container.innerHTML += `<h4>📅 ${date}</h4>`;
-          grouped[date].forEach(row => {
-            container.innerHTML += `
-          <div class="card">
-            <img src="${getUserImage(row["Email Address"])}" class="user-avatar">
-            <strong>${row["Email Address"]}</strong> → Score: <strong>${calculateTotal(row)}</strong>
-          </div>`;
-          });
-        });
-
-      } else if (dashboardMode === "winners") {
-        const grouped = {};
-        filtered.forEach(row => {
-          const date = new Date(row["Timestamp"]).toLocaleDateString();
-          grouped[date] = grouped[date] || [];
-          grouped[date].push(row);
-        });
-
-        Object.keys(grouped).sort((a, b) => new Date(b) - new Date(a)).forEach(date => {
-          const dayEntries = grouped[date].map(row => ({
-            email: row["Email Address"],
-            score: calculateTotal(row),
-            row
-          }));
-
-          const maxScore = Math.max(...dayEntries.map(e => e.score));
-          const winners = dayEntries.filter(e => e.score === maxScore);
-
-          container.innerHTML += `<h4>🏅 ${date} - Top Scorer(s)</h4>`;
-          winners.forEach(winner => {
-            container.innerHTML += `
-          <div class="score-row">
-            <img src="${getUserImage(winner.email)}" class="avatar">
-            <span class="username">${winner.email}</span>
-            <span class="score-pill positive">+${winner.score}</span>
-          </div>`;
-          });
-        });
-      }
-    }
-
-    function renderDailyDetails() {
-      const selectedDate = document.getElementById("filter-date").value;
-      const selectedUser = document.getElementById("filter-user").value;
-
-      const filtered = rawData.filter(row => {
-        const rowDate = new Date(row["Timestamp"]).toLocaleDateString();
-        return (selectedDate === 'all' || rowDate === selectedDate) &&
-          (selectedUser === 'all' || row["Email Address"] === selectedUser);
-      });
-
-      const container = document.getElementById("daily-details");
-      container.innerHTML = "";
-
-      filtered.sort((a, b) => new Date(b["Timestamp"]) - new Date(a["Timestamp"])).forEach((row) => {
-        const total = calculateTotal(row);
-        let detailHtml = `
-      <div class="card">
-        <h3>${row["Email Address"]} (${new Date(row["Timestamp"]).toLocaleDateString()})</h3>
-        <ul>`;
-
-        for (const key in row) {
-          if (key === "Timestamp" || key === "Email Address") continue;
-          const value = row[key];
-          const className = value.includes("(+") ? "positive" : value.includes("(-") ? "negative" : "neutral";
-          detailHtml += `<li class="${className}">${key}: ${value}</li>`;
+        if (!userDataMap[email]) {
+          userDataMap[email] = { name, email, img, total: 0, logs: [] };
         }
 
-        detailHtml += `
-        </ul>
-        <strong>Total Score: <span class="${total >= 0 ? 'positive' : 'negative'}">${total > 0 ? '+' : ''}${total}</span></strong>
-      </div>`;
+        userDataMap[email].total += totalPoints;
+        userDataMap[email].logs.push({ date, detail, points: totalPoints });
 
-        container.innerHTML += detailHtml;
+        dateUserPoints[date] = dateUserPoints[date] || [];
+        dateUserPoints[date].push({ name, img, email, points: totalPoints });
+
+        totalWeekPoints += totalPoints;
       });
+
+      renderLeaderboard(userDataMap);
+      renderUserCards(userDataMap);
+      renderDayToppers(dateUserPoints);
+      renderWeeklySummary(totalWeekPoints);
+      renderHabitInsights(habitCount, habitNegatives);
+      renderChart(userDataMap);
+    };
+
+    const renderLeaderboard = (userDataMap) => {
+      const sorted = Object.values(userDataMap).sort((a, b) => b.total - a.total);
+      const container = document.getElementById("leaderboardList");
+      container.innerHTML = "";
+      sorted.forEach(user => {
+        container.innerHTML += `
+          <div class="card">
+            <h3><img src="${user.img}" /> ${user.name}</h3>
+            <p class="points">Total Points: <span class="positive">${user.total}</span></p>
+          </div>`;
+      });
+    };
+
+    const renderUserCards = (userDataMap) => {
+      const container = document.getElementById("userCards");
+      container.innerHTML = "";
+      Object.values(userDataMap).forEach(user => {
+        const logs = user.logs.map(log => {
+          const items = log.detail.map(d => `<li class="${d.point >= 0 ? 'positive' : 'negative'}">${d.field}: ${d.value}</li>`).join('');
+          return `<div class="card"><h3><img src="${user.img}" /> ${user.name}</h3><h4>${log.date}</h4><ul>${items}</ul><p>Total: <strong>${log.points}</strong></p></div>`;
+        }).join("");
+        container.innerHTML += logs; //`<div class="card"><h3><img src="${user.img}" /> ${user.name}</h3>${logs}</div>`;
+      });
+    };
+
+    const renderDayToppers = (dateMap) => {
+      const container = document.getElementById("dayTopperList");
+      container.innerHTML = "";
+      Object.keys(dateMap).sort().forEach(date => {
+        const top = [...dateMap[date]].sort((a, b) => b.points - a.points)[0];
+        container.innerHTML += `
+          <div class="card">
+            <h3><img src="${top.img}" /> ${top.name}</h3>
+            <p>${date}</p>
+            <p class="points">Points: <span class="positive">${top.points}</span></p>
+          </div>`;
+      });
+    };
+
+    const renderWeeklySummary = (totalPoints) => {
+      const avg = (totalPoints / 7).toFixed(2);
+      document.getElementById("totalPoints").textContent = totalPoints;
+      document.getElementById("averageScore").textContent = avg;
+    };
+
+    const renderHabitInsights = (positives, negatives) => {
+      const best = Object.entries(positives).sort((a, b) => b[1] - a[1])[0]?.[0] || "N/A";
+      const worst = Object.entries(negatives).sort((a, b) => b[1] - a[1])[0]?.[0] || "N/A";
+      document.getElementById("bestHabit").textContent = best;
+      document.getElementById("worstHabit").textContent = worst;
+    };
+
+    const renderChart = (userDataMap) => {
+      const labels = Object.keys(userDataMap);
+      const data = Object.values(userDataMap).map(u => u.total);
+
+      const ctx = document.getElementById("trendChart").getContext("2d");
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Total Points',
+            data,
+            backgroundColor: 'rgba(76, 175, 80, 0.6)',
+            borderColor: 'rgba(76, 175, 80, 1)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: { beginAtZero: true }
+          }
+        }
+      });
+    };
+    function formatDate(isoStr) {
+      return new Date(isoStr).toISOString().split('T')[0];
     }
+    const populateFilters = (userDataMap) => {
+      const dateFilter = document.getElementById("dateFilter");
+      const nameFilter = document.getElementById("nameFilter");
+      dateFilter.innerHTML = '<option value="">All Dates</option>';
+      nameFilter.innerHTML = '<option value="">All Members</option>';
+
+
+      const dateSet = new Set();
+      const nameSet = new Set();
+      rawData.forEach(entry => {
+        dateSet.add(formatDate(entry['Timestamp']));
+        nameSet.add(entry['Email Address']);
+      });
+
+      [...dateSet].forEach(date => {
+        const opt = document.createElement("option");
+        opt.value = date;
+        opt.textContent = date;
+        dateFilter.appendChild(opt);
+      });
+
+      [...nameSet].forEach(email => {
+        const opt = document.createElement("option");
+        opt.value = email;
+        opt.textContent = emailNameMap[email] || email;
+        nameFilter.appendChild(opt);
+      });
+
+      dateFilter.addEventListener("change", applyFilters);
+      nameFilter.addEventListener("change", applyFilters);
+    };
 
     loadData();
   </script>
+
 
 </body>
 
