@@ -512,16 +512,21 @@
         const renderDayToppers = (dateMap) => {
             const container = document.getElementById("dayTopperList");
             container.innerHTML = "";
-            Object.keys(dateMap).sort().forEach(date => {
-                const top = [...dateMap[date]].sort((a, b) => b.points - a.points)[0];
-                container.innerHTML += `
-          <div class="card">
-            <h3><img src="${top.img}" /> ${top.name}</h3>
-            <p>${date}</p>
-            <p class="points">Points: <span class="positive">${top.points}</span></p>
-          </div>`;
-            });
+
+            Object.keys(dateMap)
+                .sort((a, b) => new Date(b) - new Date(a)) // Sort by date descending
+                .forEach(date => {
+                    const top = [...dateMap[date]].sort((a, b) => b.points - a.points)[0];
+                    container.innerHTML += `
+        <div class="card">
+          <h3><img src="${top.img}" /> ${top.name}</h3>
+          <p>${date}</p>
+          <p class="points">Points: <span class="positive">${top.points}</span></p>
+        </div>`;
+                });
         };
+
+
 
         const renderWeeklySummary = (totalPoints) => {
             const avg = (totalPoints / 7).toFixed(2);
