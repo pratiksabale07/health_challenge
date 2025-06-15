@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Family Health Challenge Dashboard</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js/dist/Chart.min.css">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f0f2f5;
+    }
+
+    header {
+      padding: 1rem;
+      background: linear-gradient(90deg, #4caf50, #66bb6a);
+      color: white;
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    nav {
+      background: white;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      padding: 0.5rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    nav button {
+      padding: 0.5rem 1rem;
+      background: #66bb6a;
+      border: none;
+      color: white;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    nav button:hover {
+      background: #4caf50;
+    }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      padding: 1rem;
+      background: #ffffff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .filters select {
+      flex: 1;
+      padding: 0.5rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    .leaderboard,
+    .user-details,
+    .day-topper,
+    .weekly-summary,
+    .habit-summary,
+    .chart-view {
+      padding: 1rem;
+    }
+
+    .section-title {
+      margin-bottom: 0.5rem;
+      font-size: 1.2rem;
+      color: #333;
+    }
+
+    .card {
+      background: white;
+      border-radius: 1rem;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      margin-bottom: 1rem;
+      padding: 1rem;
+      transition: transform 0.2s ease-in-out;
+    }
+
+    .card:hover {
+      transform: scale(1.02);
+    }
+
+    .card h3 {
+      margin: 0 0 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card h3 img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .points {
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+
+    .positive {
+      color: green;
+    }
+
+    .negative {
+      color: red;
+    }
+
+    ul {
+      padding-left: 1rem;
+    }
+
+    canvas {
+      width: 100% !important;
+      max-width: 600px;
+      margin: 1rem auto;
+      display: block;
+    }
+
+    #scrollTopBtn {
+      /* Hidden by default */
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      z-index: 99;
+      font-size: 1.5rem;
+      background-color: #66bb6a;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      transition: background-color 0.3s ease;
+    }
+
+    #scrollTopBtn:hover {
+      background-color: #4caf50;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f7fa;
+      margin: 0;
+      padding: 20px;
+    }
+
+    #userCards {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .card h3 {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 20px;
+      margin: 0 0 5px 0;
+    }
+
+    .card h3 img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+    }
+
+    .card h4 {
+      margin: 0 0 10px 0;
+      color: #666;
+    }
+
+    .card ul {
+      list-style: none;
+      padding-left: 0;
+      margin: 0 0 10px 0;
+    }
+
+    .card li {
+      margin-bottom: 5px;
+    }
+
+    .card li.positive {
+      color: green;
+    }
+
+    .card li.negative {
+      color: red;
+    }
+
+    .card p {
+      font-weight: bold;
+      margin: 0;
+    }
+
+
+    @media (max-width: 600px) {
+      .filters {
+        flex-direction: column;
+      }
+
+      nav {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>🏃‍♀️ Family Health Challenge</h1>
+  </header>
+  <button id="scrollTopBtn" title="Go to top">⬆️</button>
+  <nav>
+    <button onclick="scrollToSection('leaderboardList')">Leaderboard</button>
+    <button onclick="scrollToSection('weeklySummaryList')">Weekly Summary</button>
+    <button onclick="scrollToSection('habitSummaryList')">Habit Insights</button>
+    <button onclick="scrollToSection('chartSection')">Charts</button>
+    <button onclick="scrollToSection('userDetails')">User Details</button>
+    <button onclick="scrollToSection('dayTopperList')">Day wise Topper</button>
+
+  </nav>
+  <section class="filters">
+    <select id="dateFilter">
+      <option value="">All Dates</option>
+    </select>
+    <select id="nameFilter">
+      <option value="">All Members</option>
+    </select>
+  </section>
+
+  <section id="leaderboardList" class="leaderboard">
+    <h2 class="section-title">🏆 Overall Leaderboard</h2>
+    <div></div>
+  </section>
+
+  <section id="weeklySummaryList" class="weekly-summary">
+    <h2 class="section-title">📈 Weekly Summary</h2>
+    <div>
+      <div class="card">
+        <p>Total Points This Week: <span id="totalPoints" class="points"></span></p>
+        <p>Average Daily Score: <span id="averageScore" class="points"></span></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="habitSummaryList" class="habit-summary">
+    <h2 class="section-title">💡 Habit Insights</h2>
+    <div>
+      <div class="card">
+        <p>Most Common Good Habit: <span id="bestHabit" class="positive"></span></p>
+        <p>Most Common Bad Habit: <span id="worstHabit" class="negative"></span></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="chartSection" class="chart-view">
+    <h2 class="section-title">📊 Progress Charts</h2>
+    <div class="chart-container">
+      <canvas id="trendChart"></canvas>
+    </div>
+  </section>
+
+  <section id="userDetails" class="user-details">
+    <h2 class="section-title">📋 User Details</h2>
+    <div id="userCards"></div>
+  </section>
+
+  <section id="dayTopperList" class="day-topper">
+    <h2 class="section-title">🥇 Day-wise Top Performer</h2>
+    <div></div>
+  </section>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+  <script>
+    const DATA_URL = 'https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLjhdI0_yEF8tWMvX_pUGoc1DsrLV3F9pQPmt3lC2IgtgoOhQhEh-RyeN7ygKshuSJzjNKcx4lR-tyQkFKr8SuX1u9Dtwksr8L1fk2OiaYjgqfUOQq0FmWicZFtyN68Sf_ONWFh7W_jSfo3qAXovHBCVsMzdHT4Dx8iozbfiq90y5HO0y-gtiwToQvvdN88HpM9Gl5eq2zYgxNoUO-nvHgCDcKdzigSSQ6cSydDP9kyZVdXRg-vnULBzLdT7m2nI5REtV2K9Bc9jDvxFuBT11Q95NDxBVQ&lib=MyIlNBURLXuBnU_6sRfgeEjdRRDdf8ldN'; // Replace with your actual URL
+    function scrollToSection(id) {
+      document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+    }
+    const emailNameMap = {
+      "maheshsalunkhe.cssl@gmail.com": "Mahesh Salunkhe",
+      "arunasalunkhe2012@gmail.com": "Aruna Salunkhe",
+      "pratiksabale.ps@gmail.com": "Pratik Sabale",
+      "sheetalingale90.si@gmail.com": "Sheetal Salunkhe",
+      "gauridisale.gd@gmail.com": "Gauri Disale",
+      "manishasabale1771980@gmail.com": "Manisha Sabale",
+      "sanikadisale123@gmail.com": "Sanika Disale",
+      "mayadisale410@gmail.com": "Maya Disale",
+      "sakshamsalunkhe2021@gmail.com": "Saksham Salunkhe",
+      "parassabale.sp@gmail.com": "Aryan Sabale",
+      "pratiksabale2001@gmail.com": "Tanaji Sabale"
+    };
+
+    const emailImageMap = {
+      "maheshsalunkhe.cssl@gmail.com": 'images/Mahesh.jpg',
+      "arunasalunkhe2012@gmail.com": 'images/Aruna.jpg',
+      "pratiksabale.ps@gmail.com": "images/Pratik.jpg",
+      "sheetalingale90.si@gmail.com": "images/Sheetal.jpg",
+      "gauridisale.gd@gmail.com": "images/Gauri.jpg",
+      "manishasabale1771980@gmail.com": "images/Manisha.jpg",
+      "sanikadisale123@gmail.com": "images/Sanika.jpg",
+      "mayadisale410@gmail.com": "images/Maya.jpg",
+      "sakshamsalunkhe2021@gmail.com": "images/Saksham.jpg",
+      "parassabale.sp@gmail.com": "images/Aryan.jpg",
+      "pratiksabale2001@gmail.com": "images/Tanaji.jpg"
+    };
+
+    let rawData = [];
+    let filteredData = [];
+
+    const parsePoints = (text = '') => {
+      const matches = [...text.matchAll(/\(([-+]\d+)\)/g)];
+      return matches.reduce((sum, match) => sum + parseInt(match[1], 10), 0);
+    };
+
+    const groupBy = (arr, keyFn) => {
+      return arr.reduce((acc, item) => {
+        const key = keyFn(item);
+        acc[key] = acc[key] || [];
+        acc[key].push(item);
+        return acc;
+      }, {});
+    };
+
+    const loadData = async () => {
+      const res = await fetch(DATA_URL);
+      rawData = await res.json();
+      populateFilters(rawData)
+      applyFilters();
+    };
+
+    const applyFilters = () => {
+      const dateValue = document.getElementById("dateFilter").value;
+      const nameValue = document.getElementById("nameFilter").value;
+
+      filteredData = rawData.filter(entry => {
+        const matchDate = !dateValue || new Date(entry.Timestamp).toISOString().split('T')[0] === dateValue;
+        const matchName = !nameValue || entry["Email Address"] === nameValue;
+        return matchDate && matchName;
+      });
+
+      processData();
+    };
+
+    const processData = () => {
+      const userDataMap = {};
+      const dateUserPoints = {};
+      const habitCount = {};
+      const habitNegatives = {};
+      let totalWeekPoints = 0;
+
+      filteredData.forEach(entry => {
+        const email = entry["Email Address"];
+        const date = new Date(entry.Timestamp).toISOString().split('T')[0];
+        const name = emailNameMap[email] || email;
+        const img = emailImageMap[email];
+
+        const fields = Object.keys(entry).filter(k => !["Timestamp", "Email Address"].includes(k));
+        let totalPoints = 0;
+        const detail = [];
+
+        fields.forEach(field => {
+          const value = entry[field];
+          const point = parsePoints(value);
+          totalPoints += point;
+          detail.push({ field, value, point });
+
+          if (point > 0) {
+            habitCount[field + " " + value] = (habitCount[field + " " + value] || 0) + 1;
+          } else if (point < 0) {
+            habitNegatives[field + " " + value] = (habitNegatives[field + " " + value] || 0) + 1;
+          }
+        });
+
+        if (!userDataMap[email]) {
+          userDataMap[email] = { name, email, img, total: 0, logs: [] };
+        }
+
+        userDataMap[email].total += totalPoints;
+        userDataMap[email].logs.push({ date, detail, points: totalPoints });
+
+        dateUserPoints[date] = dateUserPoints[date] || [];
+        dateUserPoints[date].push({ name, img, email, points: totalPoints });
+
+        totalWeekPoints += totalPoints;
+      });
+
+      const scrollBtn = document.getElementById("scrollTopBtn");
+      window.onscroll = function () {
+        if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+          scrollBtn.style.display = "block";
+        } else {
+          scrollBtn.style.display = "none";
+        }
+      };
+
+      scrollBtn.onclick = function () {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      };
+
+      renderLeaderboard(userDataMap);
+      renderUserCards(userDataMap);
+      renderDayToppers(dateUserPoints);
+      renderWeeklySummary(totalWeekPoints);
+      renderHabitInsights(habitCount, habitNegatives);
+      renderChart(userDataMap);
+    };
+
+    const renderLeaderboard = (userDataMap) => {
+      const sorted = Object.values(userDataMap).sort((a, b) => b.total - a.total);
+      const container = document.getElementById("leaderboardList");
+      container.innerHTML = "";
+      sorted.forEach(user => {
+        container.innerHTML += `
+          <div class="card">
+            <h3><img src="${user.img}" /> ${user.name}</h3>
+            <p class="points">Total Points: <span class="positive">${user.total}</span></p>
+          </div>`;
+      });
+    };
+
+    const renderUserCards = (userDataMap) => {
+      const container = document.getElementById("userCards");
+      container.innerHTML = "";
+
+      // Step 1: Flatten all user logs with user info
+      const allLogs = [];
+      Object.values(userDataMap).forEach(user => {
+        user.logs.forEach(log => {
+          allLogs.push({
+            name: user.name,
+            img: user.img,
+            date: log.date,
+            points: log.points,
+            detail: log.detail
+          });
+        });
+      });
+
+      // Step 2: Sort logs by date (latest first)
+      allLogs.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      // Step 3: Render each log in card format
+      allLogs.forEach(log => {
+        const items = log.detail.map(d =>
+          `<li class="${d.point >= 0 ? 'positive' : 'negative'}">${d.field}: ${d.value}</li>`
+        ).join('');
+
+        container.innerHTML += `
+      <div class="card">
+        <h3><img src="${log.img}" /> ${log.name}</h3>
+        <h4>${log.date}</h4>
+        <ul>${items}</ul>
+        <p>Total: <strong>${log.points}</strong></p>
+      </div>
+    `;
+      });
+    };
+
+
+    const renderDayToppers = (dateMap) => {
+      const container = document.getElementById("dayTopperList");
+      container.innerHTML = "";
+      Object.keys(dateMap).sort().forEach(date => {
+        const top = [...dateMap[date]].sort((a, b) => b.points - a.points)[0];
+        container.innerHTML += `
+          <div class="card">
+            <h3><img src="${top.img}" /> ${top.name}</h3>
+            <p>${date}</p>
+            <p class="points">Points: <span class="positive">${top.points}</span></p>
+          </div>`;
+      });
+    };
+
+    const renderWeeklySummary = (totalPoints) => {
+      const avg = (totalPoints / 7).toFixed(2);
+      document.getElementById("totalPoints").textContent = totalPoints;
+      document.getElementById("averageScore").textContent = avg;
+    };
+
+    const renderHabitInsights = (positives, negatives) => {
+      const best = Object.entries(positives).sort((a, b) => b[1] - a[1])[0]?.[0] || "N/A";
+      const worst = Object.entries(negatives).sort((a, b) => b[1] - a[1])[0]?.[0] || "N/A";
+      document.getElementById("bestHabit").textContent = best;
+      document.getElementById("worstHabit").textContent = worst;
+    };
+
+    const renderChart = (userDataMap) => {
+      // Convert to array and sort by total descending
+      const sortedEntries = Object.entries(userDataMap)
+        .sort(([, a], [, b]) => b.total - a.total);
+
+      const labels = sortedEntries.map(([email]) => emailNameMap[email]);
+      const data = sortedEntries.map(([, user]) => user.total);
+
+      // Define a color palette
+      const backgroundColors = [
+        '#4caf50', '#2196f3', '#ff9800', '#e91e63',
+        '#9c27b0', '#00bcd4', '#ff5722', '#3f51b5',
+        '#009688', '#795548'
+      ];
+
+      const ctx = document.getElementById("trendChart").getContext("2d");
+
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Total Points',
+            data,
+            backgroundColor: data.map((_, i) => backgroundColors[i % backgroundColors.length]),
+            borderColor: data.map((_, i) => backgroundColors[i % backgroundColors.length]),
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Points'
+              }
+            },
+            x: {
+              title: {
+                display: true,
+                text: 'Users'
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              display: false
+            }
+          }
+        }
+      });
+    };
+
+
+    function formatDate(isoStr) {
+      return new Date(isoStr).toISOString().split('T')[0];
+    }
+    const populateFilters = (userDataMap) => {
+      const dateFilter = document.getElementById("dateFilter");
+      const nameFilter = document.getElementById("nameFilter");
+      dateFilter.innerHTML = '<option value="">All Dates</option>';
+      nameFilter.innerHTML = '<option value="">All Members</option>';
+
+
+      const dateSet = new Set();
+      const nameSet = new Set();
+      rawData.forEach(entry => {
+        dateSet.add(formatDate(entry['Timestamp']));
+        nameSet.add(entry['Email Address']);
+      });
+      const sortedDates = Array.from(dateSet).sort((a, b) => new Date(b) - new Date(a));
+      [...sortedDates].forEach(date => {
+        const opt = document.createElement("option");
+        opt.value = date;
+        opt.textContent = date;
+        dateFilter.appendChild(opt);
+      });
+
+      [...nameSet].forEach(email => {
+        const opt = document.createElement("option");
+        opt.value = email;
+        opt.textContent = emailNameMap[email] || email;
+        nameFilter.appendChild(opt);
+      });
+
+      dateFilter.addEventListener("change", applyFilters);
+      nameFilter.addEventListener("change", applyFilters);
+    };
+
+    loadData();
+  </script>
+
+
+</body>
+
+</html>
